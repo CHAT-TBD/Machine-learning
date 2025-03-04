@@ -27,15 +27,13 @@ async function sendMessage() {
     let loadingMessage = appendMessage("bot", "🤖 กำลังคิด...");
 
     try {
-        console.log("🚀 ส่งข้อความไปที่ Hugging Face API:", userText);
+        console.log("🚀 ส่งข้อความไปที่ Wit.ai API:", userText);
 
-        let response = await fetch("https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill", {
-            method: "POST",
+        let response = await fetch(`https://api.wit.ai/message?v=20230215&q=${encodeURIComponent(userText)}`, {
+            method: "GET",
             headers: {
-                "Authorization": "Bearer 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", // ใช้ API Key ของคุณ
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ inputs: userText })
+                "Authorization": "Bearer GQXGMJZJPM7NBK6GJTOCIFEPVEVKYWBN"
+            }
         });
 
         if (!response.ok) {
@@ -45,7 +43,7 @@ async function sendMessage() {
         let data = await response.json();
         console.log("✅ API ตอบกลับ:", data);
 
-        let botReply = data[0]?.generated_text || "⚠️ ไม่มีข้อความตอบกลับจาก API";
+        let botReply = data?.entities?.intent?.[0]?.value || "⚠️ ไม่สามารถเข้าใจข้อความของคุณได้";
         loadingMessage.innerText = botReply;
     } catch (error) {
         console.error("❌ Error:", error);
