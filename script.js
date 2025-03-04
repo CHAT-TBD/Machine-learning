@@ -27,13 +27,14 @@ async function sendMessage() {
     let loadingMessage = appendMessage("bot", "🤖 กำลังคิด...");
 
     try {
-        console.log("🚀 ส่งข้อความไปที่ Wit.ai API:", userText);
+        console.log("🚀 ส่งข้อความไปที่ Dialogflow API:", userText);
 
-        let response = await fetch(`https://api.wit.ai/message?v=20230215&q=${encodeURIComponent(userText)}`, {
-            method: "GET",
+        let response = await fetch("https://bot.dialogflow.com/b091ad85-8b90-464d-b776-c53cfe4d336a", {
+            method: "POST",
             headers: {
-                "Authorization": "Bearer GQXGMJZJPM7NBK6GJTOCIFEPVEVKYWBN"
-            }
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ queryInput: { text: { text: userText, languageCode: "th" } } })
         });
 
         if (!response.ok) {
@@ -43,7 +44,8 @@ async function sendMessage() {
         let data = await response.json();
         console.log("✅ API ตอบกลับ:", data);
 
-        let botReply = data?.entities?.intent?.[0]?.value || "⚠️ ไม่สามารถเข้าใจข้อความของคุณได้";
+        let botReply = data?.queryResult?.fulfillmentText || "⚠️ ฉันไม่เข้าใจ กรุณาลองใหม่";
+
         loadingMessage.innerText = botReply;
     } catch (error) {
         console.error("❌ Error:", error);
