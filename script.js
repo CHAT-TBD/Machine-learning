@@ -10,7 +10,7 @@ function appendMessage(sender, message) {
 }
 
 // **คำศัพท์ที่ AI คิดเอง**
-const nouns = ["แมว", "สุนัข", "นก", "เด็ก", "หุ่นยนต์", "ต้นไม้", "ภูเขา"];
+const nouns = ["แมว", "สุนัข", "นก", "เด็ก", "หุ่นยนต์", "ต้นไม้", "ภูเขา", "ฉัน"];
 const verbs = ["กิน", "วิ่ง", "กระโดด", "นอน", "พูด", "เรียน", "สร้าง"];
 const adjectives = ["เร็ว", "น่ารัก", "ฉลาด", "แปลก", "ตลก", "แข็งแกร่ง"];
 const objects = ["ข้าว", "หนังสือ", "เกม", "ปากกา", "มือถือ", "โลก"];
@@ -25,9 +25,9 @@ function generateSentence() {
     let sentenceType = Math.random();
     
     if (sentenceType < 0.5) {
-        return `${subject} ${verb} ${object} อย่าง${adjective}`;
+        return `${subject}${verb}${object}อย่าง${adjective}`;
     } else {
-        return `วันนี้ ${subject} ดู${adjective} มากเลย!`;
+        return `วันนี้${subject}ดู${adjective}มากเลย!`;
     }
 }
 
