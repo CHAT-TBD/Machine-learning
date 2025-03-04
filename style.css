@@ -49,3 +49,21 @@ button {
 button:hover {
     background: #0056b3;
 }
+
+.user-message {
+    background: #007bff;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 10px;
+    margin: 5px 0;
+    text-align: right;
+}
+
+.bot-message {
+    background: #e1e1e1;
+    color: black;
+    padding: 8px 12px;
+    border-radius: 10px;
+    margin: 5px 0;
+    text-align: left;
+}
