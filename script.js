@@ -27,12 +27,15 @@ async function sendMessage() {
     let loadingMessage = appendMessage("bot", "🤖 กำลังคิด...");
 
     try {
-        console.log("🚀 ส่งข้อความไปที่ API:", userText);
+        console.log("🚀 ส่งข้อความไปที่ Hugging Face API:", userText);
 
-        let response = await fetch("https://api.ml-chatgpt.com/v1/chat", {
+        let response = await fetch("https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: userText })
+            headers: {
+                "Authorization": "Bearer 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", // ใช้ API Key ของคุณ
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ inputs: userText })
         });
 
         if (!response.ok) {
@@ -42,7 +45,7 @@ async function sendMessage() {
         let data = await response.json();
         console.log("✅ API ตอบกลับ:", data);
 
-        let botReply = data.text || data.response || "⚠️ ไม่มีข้อความตอบกลับจาก API";
+        let botReply = data[0]?.generated_text || "⚠️ ไม่มีข้อความตอบกลับจาก API";
         loadingMessage.innerText = botReply;
     } catch (error) {
         console.error("❌ Error:", error);
