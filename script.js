@@ -18,31 +18,35 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 async function sendMessage() {
-    let userInput = document.getElementById("user-input").value.trim();
-    if (userInput === "") return;
+    let userText = document.getElementById("user-input").value.trim();
+    if (userText === "") return;
 
-    appendMessage("user", userInput);
+    appendMessage("user", userText);
     document.getElementById("user-input").value = "";
 
-    let loadingMessage = appendMessage("bot", "กำลังคิด...");
+    let loadingMessage = appendMessage("bot", "🤖 กำลังคิด...");
 
     try {
-        console.log("🚀 ส่งข้อความไปที่ API:", userInput);
+        console.log("🚀 ส่งข้อความไปที่ API:", userText);
+
         let response = await fetch("https://api.ml-chatgpt.com/v1/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: userInput })
+            body: JSON.stringify({ text: userText })
         });
 
-        if (!response.ok) throw new Error(`❌ API ตอบกลับผิดพลาด: ${response.status}`);
+        if (!response.ok) {
+            throw new Error(`❌ API ตอบกลับผิดพลาด: ${response.status} ${response.statusText}`);
+        }
 
         let data = await response.json();
         console.log("✅ API ตอบกลับ:", data);
 
-        loadingMessage.innerText = data.text || "ไม่มีข้อมูลตอบกลับ";
+        let botReply = data.text || data.response || "⚠️ ไม่มีข้อความตอบกลับจาก API";
+        loadingMessage.innerText = botReply;
     } catch (error) {
         console.error("❌ Error:", error);
-        loadingMessage.innerText = "ขออภัย มีข้อผิดพลาดในการเชื่อมต่อ API";
+        loadingMessage.innerText = "⚠️ ขออภัย มีข้อผิดพลาดในการเชื่อมต่อ API";
     }
 }
 
