@@ -1,33 +1,62 @@
 let chatBox = document.getElementById("chat-box");
 let userInput = document.getElementById("user-input");
 
+// โหลดข้อมูล AI จาก memory.json
+let memory = {};
+fetch("memory.json")
+    .then(response => response.json())
+    .then(data => memory = data);
+
 // ฟังก์ชันแสดงข้อความในกล่องแชท
-function appendMessage(sender, message) {
+function appendMessage(sender, message, isAI = false, question = "") {
     let messageDiv = document.createElement("div");
     messageDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
+    
+    if (isAI) {
+        let goodButton = document.createElement("button");
+        goodButton.innerText = "✅ Good";
+        goodButton.onclick = () => rateResponse(question, message, true);
+        
+        let badButton = document.createElement("button");
+        badButton.innerText = "❌ Bad";
+        badButton.onclick = () => rateResponse(question, message, false);
+        
+        messageDiv.appendChild(goodButton);
+        messageDiv.appendChild(badButton);
+    }
+    
     chatBox.appendChild(messageDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// **คำศัพท์ที่ AI คิดเอง**
-const nouns = ["แมว", "สุนัข", "นก", "เด็ก", "หุ่นยนต์", "ต้นไม้", "ภูเขา", "ฉัน"];
-const verbs = ["กิน", "วิ่ง", "กระโดด", "นอน", "พูด", "เรียน", "สร้าง"];
-const adjectives = ["เร็ว", "น่ารัก", "ฉลาด", "แปลก", "ตลก", "แข็งแกร่ง"];
-const objects = ["ข้าว", "หนังสือ", "เกม", "ปากกา", "มือถือ", "โลก"];
-
-// **ฟังก์ชันสุ่มคำและสร้างประโยค**
-function generateSentence() {
-    let subject = nouns[Math.floor(Math.random() * nouns.length)];
-    let verb = verbs[Math.floor(Math.random() * verbs.length)];
-    let object = objects[Math.floor(Math.random() * objects.length)];
-    let adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
-
-    let sentenceType = Math.random();
+// **ฟังก์ชันวิเคราะห์คำถาม**
+function findBestResponse(inputText) {
+    let tokens = inputText.split(/\s+/);
     
-    if (sentenceType < 0.5) {
-        return `${subject}${verb}${object}อย่าง${adjective}`;
+    // ค้นหาคำถามที่มีอยู่ใน memory.json
+    for (let key in memory) {
+        let keyTokens = key.split(/\s+/);
+        let matchCount = tokens.filter(t => keyTokens.includes(t)).length;
+        let score = matchCount / keyTokens.length;
+        
+        if (score > 0.5) {
+            return memory[key][Math.floor(Math.random() * memory[key].length)];
+        }
+    }
+
+    return generateDynamicResponse(inputText);
+}
+
+// **ฟังก์ชันสร้างคำตอบ AI**
+function generateDynamicResponse(inputText) {
+    let tokens = inputText.split(/\s+/);
+    
+    if (tokens.includes("ชื่อ")) {
+        return "ฉันคือ AI บอท!";
+    } else if (tokens.includes("ทำอะไร")) {
+        return "ฉันสามารถช่วยตอบคำถามของคุณได้!";
     } else {
-        return `วันนี้${subject}ดู${adjective}มากเลย!`;
+        return "ฉันยังไม่รู้คำตอบ แต่คุณสามารถสอนฉันได้นะ!";
     }
 }
 
@@ -39,10 +68,26 @@ function sendMessage() {
     appendMessage("คุณ", text);
     userInput.value = "";
 
-    // ให้ AI คิดประโยคใหม่เอง
-    let reply = generateSentence();
+    // ให้ AI คิดคำตอบเอง
+    let reply = findBestResponse(text);
     
-    setTimeout(() => appendMessage("AI", reply), 500);
+    setTimeout(() => appendMessage("AI", reply, true, text), 500);
+}
+
+// **ฟังก์ชันให้คะแนน AI**
+function rateResponse(question, answer, isGood) {
+    if (isGood) {
+        alert("ขอบคุณ! ฉันจะใช้คำตอบนี้ต่อไป");
+    } else {
+        let newAnswer = prompt("คำตอบที่ถูกต้องคืออะไร?");
+        if (newAnswer) {
+            if (!memory[question]) {
+                memory[question] = [];
+            }
+            memory[question].push(newAnswer);
+            alert("ฉันจะจำคำตอบนี้ไว้!");
+        }
+    }
 }
 
 // กด Enter เพื่อส่งข้อความ
