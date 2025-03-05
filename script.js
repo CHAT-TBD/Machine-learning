@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
         appendMessage("user", userText);
         userInput.value = "";
 
-        let loadingMessage = appendMessage("bot", "🤖 กำลังคิด...");
+        let loadingMessage = appendMessage("bot", "กำลังคิด...");
 
         try {
             let response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=AIzaSyDF7fFIDnZw4dEQmXq_G9WRDjqLwxv0Vxw", {  // ใส่ API จริงที่นี่
