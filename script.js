@@ -27,14 +27,13 @@ async function sendMessage() {
     let loadingMessage = appendMessage("bot", "🤖 กำลังคิด...");
 
     try {
-        console.log("🚀 ส่งข้อความไปที่ Gemini API:", userText);
+        console.log("🚀 ส่งข้อความไปที่ API:", userText);
 
-        let response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyBoaLIM-rmHyeNRR6Hgj1MwsK4RZGwG7Qk", {
+        let API_KEY = "AIzaSyBlZukIN4b2xspxa8y3oZE24feshlwB2Hs"; // 🔴 แทนที่ด้วย API Key ของคุณ
+        let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                contents: [{ role: "user", parts: [{ text: userText }] }]
-            })
+            body: JSON.stringify({ contents: [{ parts: [{ text: userText }] }] })
         });
 
         if (!response.ok) {
