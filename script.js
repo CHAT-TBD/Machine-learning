@@ -34,7 +34,7 @@ async function sendMessage() {
     try {
         console.log("🚀 ส่งข้อความไปที่ Gemini API:", userText);
 
-        let response = await fetch("https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=AIzaSyDF7fFIDnZw4dEQmXq_G9WRDjqLwxv0Vxw", {
+        let response = await fetch("https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=AIzaSyD7fZwPz3lryMnXb1iHn92JXFddMFehdPc", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
