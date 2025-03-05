@@ -62,7 +62,7 @@ async function sendMessage() {
     } catch (error) {
         clearInterval(loadingInterval); // หยุดการหมุนจุด "..." กรณี error
         console.error("❌ Error:", error);
-        loadingMessage.innerText = "⚠️ ขออภัย มีข้อผิดพลาดในการเชื่อมต่อ API";
+        loadingMessage.innerText = "⚠️ ขออภัย กำลังติดตั้ง Data โปรดรอ...";
     }
 }
 
