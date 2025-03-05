@@ -27,16 +27,18 @@ async function sendMessage() {
     let loadingMessage = appendMessage("bot", "🤖 กำลังคิด...");
 
     try {
-        console.log("🚀 ส่งข้อความไปที่ Dialogflow API:", userText);
+        console.log("🚀 ส่งข้อความไปที่ Gemini API:", userText);
 
         let response = await fetch(
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyDF7fFIDnZw4dEQmXq_G9WRDjqLwxv0Vxw", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ queryInput: { text: { text: userText, languageCode: "th" } } })
-        });
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=AIzaSyDF7fFIDnZw4dEQmXq_G9WRDjqLwxv0Vxw", 
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: userText }] }]
+                })
+            }
+        );
 
         if (!response.ok) {
             throw new Error(`❌ API ตอบกลับผิดพลาด: ${response.status} ${response.statusText}`);
@@ -45,7 +47,7 @@ async function sendMessage() {
         let data = await response.json();
         console.log("✅ API ตอบกลับ:", data);
 
-        let botReply = data?.queryResult?.fulfillmentText || "⚠️ ฉันไม่เข้าใจ กรุณาลองใหม่";
+        let botReply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ ฉันไม่เข้าใจ กรุณาลองใหม่";
 
         loadingMessage.innerText = botReply;
     } catch (error) {
