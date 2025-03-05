@@ -32,20 +32,17 @@ async function sendMessage() {
     }, 500);
 
     try {
-        console.log("🚀 ส่งข้อความไปที่ OpenAI API:", userText);
+        console.log("🚀 ส่งข้อความไปที่ Gemini API:", userText);
 
-        let response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer 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" // ใส่ API Key ที่ถูกต้อง
-    },
-    body: JSON.stringify({
-        model: "gpt-4-turbo", // หรือ gpt-3.5-turbo
-        messages: [{ role: "system", content: "คุณคือแชทบอทอัจฉริยะ" },
-                   { role: "user", content: userText }]
-    })
-});
+        let response = await fetch("https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=YOUR_GEMINI_API_KEY", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: userText }] }]
+            })
+        });
 
         clearInterval(loadingInterval); // หยุดการหมุนจุด "..."
         
@@ -56,13 +53,13 @@ async function sendMessage() {
         let data = await response.json();
         console.log("✅ API ตอบกลับ:", data);
 
-        let botReply = data.choices[0].message.content || "⚠️ ฉันไม่เข้าใจ กรุณาลองใหม่";
+        let botReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ ฉันไม่เข้าใจ กรุณาลองใหม่";
 
         loadingMessage.innerText = botReply;
     } catch (error) {
         clearInterval(loadingInterval); // หยุดการหมุนจุด "..." กรณี error
         console.error("❌ Error:", error);
-        loadingMessage.innerText = "⚠️ ขออภัย กำลังติดตั้ง Data โปรดรอ...";
+        loadingMessage.innerText = "⚠️ ขออภัย ระบบมีปัญหา กรุณาลองใหม่อีกครั้ง";
     }
 }
 
