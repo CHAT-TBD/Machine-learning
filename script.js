@@ -38,7 +38,7 @@ async function sendMessage() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": "Bearer float16-AG0F8yNce5s1DiXm1ujcNrTaZquEdaikLwhZBRhyZQNeS7Dv0X"
+                "Authorization": "Bearer float16-9YQJTahVzkD1v7TAa15pdvDlernEkfjMjfOnoWlr1Cvu1hFYvp"
             },
             body: JSON.stringify({
                 model: "openthaigpt/openthaigpt1.5-7b-instruct",
