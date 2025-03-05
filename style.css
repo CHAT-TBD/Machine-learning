@@ -1,6 +1,8 @@
+/* พื้นหลังสีเข้มเหมือน ChatGPT */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    background-color: #343541;
+    color: white;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -8,34 +10,72 @@ body {
     margin: 0;
 }
 
+/* กล่องแชท */
 .chat-container {
-    width: 400px;
-    background: white;
+    width: 90%;
+    max-width: 450px;
+    background: #444654;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 }
 
+/* หัวข้อแชท */
+.chat-header {
+    background: #202123;
+    padding: 15px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* กล่องข้อความ */
 .chat-box {
     height: 400px;
     overflow-y: auto;
     padding: 10px;
-    border-bottom: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
+/* ข้อความของผู้ใช้ */
+.user-message {
+    background: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 10px;
+    align-self: flex-end;
+    max-width: 75%;
+}
+
+/* ข้อความของบอท */
+.bot-message {
+    background: #50515b;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 10px;
+    align-self: flex-start;
+    max-width: 75%;
+}
+
+/* กล่องอินพุต */
 .input-container {
     display: flex;
     padding: 10px;
-    background: #fff;
+    background: #202123;
 }
 
+/* ช่องกรอกข้อความ */
 input {
     flex: 1;
     padding: 10px;
-    border: 1px solid #ddd;
+    border: none;
     border-radius: 5px;
+    background: #444654;
+    color: white;
 }
 
+/* ปุ่มส่ง */
 button {
     background: #007bff;
     color: white;
@@ -48,22 +88,4 @@ button {
 
 button:hover {
     background: #0056b3;
-}
-
-.user-message {
-    background: #007bff;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 10px;
-    margin: 5px 0;
-    text-align: right;
-}
-
-.bot-message {
-    background: #e1e1e1;
-    color: black;
-    padding: 8px 12px;
-    border-radius: 10px;
-    margin: 5px 0;
-    text-align: left;
 }
