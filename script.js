@@ -35,16 +35,17 @@ async function sendMessage() {
         console.log("🚀 ส่งข้อความไปที่ OpenAI API:", userText);
 
         let response = await fetch("https://api.openai.com/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer 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" // ใส่ API Key ตรงนี้
-            },
-            body: JSON.stringify({
-                model: "gpt-4",
-                messages: [{ role: "user", content: userText }]
-            })
-        });
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer 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" // ใส่ API Key ที่ถูกต้อง
+    },
+    body: JSON.stringify({
+        model: "gpt-4-turbo", // หรือ gpt-3.5-turbo
+        messages: [{ role: "system", content: "คุณคือแชทบอทอัจฉริยะ" },
+                   { role: "user", content: userText }]
+    })
+});
 
         clearInterval(loadingInterval); // หยุดการหมุนจุด "..."
         
