@@ -32,14 +32,20 @@ async function sendMessage() {
     }, 500);
 
     try {
-        console.log("🚀 ส่งข้อความไปที่ ML-ChatGPT API:", userText);
+        console.log("🚀 ส่งข้อความไปที่ OpenThaiGPT API:", userText);
 
-        let response = await fetch("https://your-github-username.github.io/ML-ChatGPT-API/chat", {
+        let response = await fetch("https://api.float16.cloud/dedicate/78y8fJLuzE/v1/completions", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": "Bearer float16-AG0F8yNce5s1DiXm1ujcNrTaZquEdaikLwhZBRhyZQNeS7Dv0X"
             },
-            body: JSON.stringify({ prompt: userText })
+            body: JSON.stringify({
+                model: "openthaigpt/openthaigpt1.5-7b-instruct",
+                prompt: userText,
+                max_tokens: 500,
+                temperature: 0.7
+            })
         });
 
         clearInterval(loadingInterval); // หยุดการหมุนจุด "..."
@@ -51,7 +57,7 @@ async function sendMessage() {
         let data = await response.json();
         console.log("✅ API ตอบกลับ:", data);
 
-        let botReply = data.response || "⚠️ ฉันไม่เข้าใจ กรุณาลองใหม่";
+        let botReply = data.choices?.[0]?.text?.trim() || "⚠️ ฉันไม่เข้าใจ กรุณาลองใหม่";
         loadingMessage.innerText = botReply;
     } catch (error) {
         clearInterval(loadingInterval); // หยุดการหมุนจุด "..." กรณี error
