@@ -24,7 +24,7 @@ async function sendMessage() {
     appendMessage("user", userText);
     document.getElementById("user-input").value = "";
 
-    let loadingMessage = appendMessage("bot", "🤖 กำลังคิด");
+    let loadingMessage = appendMessage("bot", "🤖 กำลังคิด...");
     let dots = 0;
     let loadingInterval = setInterval(() => {
         dots = (dots + 1) % 4; 
@@ -32,16 +32,14 @@ async function sendMessage() {
     }, 500);
 
     try {
-        console.log("🚀 ส่งข้อความไปที่ Gemini API:", userText);
+        console.log("🚀 ส่งข้อความไปที่ ML-ChatGPT API:", userText);
 
-        let response = await fetch("https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=AIzaSyD7fZwPz3lryMnXb1iHn92JXFddMFehdPc", {
+        let response = await fetch("https://your-github-username.github.io/ML-ChatGPT-API/chat", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: userText }] }]
-            })
+            body: JSON.stringify({ prompt: userText })
         });
 
         clearInterval(loadingInterval); // หยุดการหมุนจุด "..."
@@ -53,8 +51,7 @@ async function sendMessage() {
         let data = await response.json();
         console.log("✅ API ตอบกลับ:", data);
 
-        let botReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ ฉันไม่เข้าใจ กรุณาลองใหม่";
-
+        let botReply = data.response || "⚠️ ฉันไม่เข้าใจ กรุณาลองใหม่";
         loadingMessage.innerText = botReply;
     } catch (error) {
         clearInterval(loadingInterval); // หยุดการหมุนจุด "..." กรณี error
