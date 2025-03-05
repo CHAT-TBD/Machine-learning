@@ -3,17 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ML-ChatGPT</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #chat-box { width: 90%; max-width: 400px; height: 300px; border: 1px solid #ccc; overflow-y: auto; padding: 10px; margin: 20px auto; }
+        .user-message { text-align: right; color: blue; }
+        .bot-message { text-align: left; color: green; }
+        #user-input { width: 70%; padding: 5px; }
+        #send-btn { padding: 5px 10px; }
+    </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div id="chat-box" class="chat-box"></div>
-        <div class="input-container">
-            <input type="text" id="user-input" placeholder="พิมพ์ข้อความที่นี่...">
-            <button id="send-btn">ส่ง</button>
-        </div>
-    </div>
+    <h1>Chatbot</h1>
+    <div id="chat-box"></div>
+    <input type="text" id="user-input" placeholder="พิมพ์ข้อความ..." />
+    <button id="send-btn">ส่ง</button>
     <script src="script.js"></script>
 </body>
 </html>
