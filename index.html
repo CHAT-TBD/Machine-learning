@@ -4,16 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Chatbot</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <link rel="stylesheet" href="style.css">
     <script defer src="chatbot.js"></script>
-    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="chat-container">
+    <div class="container">
         <h1>AI Chatbot</h1>
-        <div id="chat-box"></div>
-        <input type="text" id="user-input" placeholder="Type a message...">
-        <button onclick="sendMessage()">Send</button>
+        <button onclick="startTraining()">เริ่มเทรนโมเดล</button>
+        <p id="status">สถานะ: รอเริ่มเทรน</p>
+
+        <div class="chatbox">
+            <input type="text" id="userInput" placeholder="พิมพ์ข้อความ...">
+            <button onclick="sendMessage()">ส่ง</button>
+        </div>
+        <p id="chatResponse"></p>
     </div>
 </body>
 </html>
