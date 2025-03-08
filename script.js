@@ -1,6 +1,6 @@
 const GIST_ID = "ff808b6318c68d96737b7f90ac7036e0";
 const GIST_URL = `https://gist.githubusercontent.com/raw/${GIST_ID}/chatbot-data.json`;
-const GITHUB_TOKEN = "ใส่-Token-ที่นี่";
+const GITHUB_TOKEN = "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";
 const GIST_UPDATE_URL = `https://api.github.com/gists/${GIST_ID}`;
 
 let chatData = {};
