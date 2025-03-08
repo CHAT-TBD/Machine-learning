@@ -1,32 +1,53 @@
-import tensorflow as tf
-import numpy as np
-import tensorflowjs as tfjs
 import pickle
-import time
+import sqlite3
+import numpy as np
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, LSTM, Embedding
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 
-VOCAB_SIZE = 1000
-MAX_LEN = 10
+# โหลดข้อมูลจากฐานข้อมูล
+def load_data():
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT question, answer FROM chatbot_feedback WHERE feedback='good'")
+    data = cursor.fetchall()
+    conn.close()
+    return data
 
-# สร้างโมเดล LSTM
-model = tf.keras.Sequential([
-    tf.keras.layers.Embedding(input_dim=VOCAB_SIZE, output_dim=32, input_length=MAX_LEN),
-    tf.keras.layers.LSTM(64, return_sequences=True),
-    tf.keras.layers.LSTM(64),
-    tf.keras.layers.Dense(VOCAB_SIZE, activation="softmax")
-])
+# เทรนโมเดลจากข้อมูลในฐานข้อมูล
+def train_model():
+    data = load_data()
+    
+    if len(data) < 10:
+        print("ข้อมูลยังน้อยเกินไปสำหรับการเทรน!")
+        return
+    
+    questions, answers = zip(*data)
+    tokenizer = Tokenizer(num_words=1000)
+    tokenizer.fit_on_texts(questions + answers)
 
-model.compile(loss="sparse_categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
+    X = tokenizer.texts_to_sequences(questions)
+    y = tokenizer.texts_to_sequences(answers)
 
-# เทรนโมเดล (จำลองว่าใช้เวลานาน)
-for epoch in range(1, 6):
-    time.sleep(2)
-    print(f"Epoch {epoch}/5 กำลังเทรน...")
+    X = pad_sequences(X, maxlen=10)
+    y = pad_sequences(y, maxlen=10)
 
-# บันทึกโมเดลสำหรับ TensorFlow.js
-tfjs.converters.save_keras_model(model, "chatbot_model")
+    model = Sequential([
+        Embedding(input_dim=1000, output_dim=64, input_length=10),
+        LSTM(64, return_sequences=True),
+        LSTM(64),
+        Dense(1000, activation="softmax")
+    ])
 
-# บันทึกโมเดลเป็นไฟล์ pickle เพื่อใช้ใน Flask
-with open("chatbot_model.pkl", "wb") as f:
-    pickle.dump(model, f)
+    model.compile(loss="sparse_categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
+    model.fit(X, np.array(y), epochs=5)
 
-print("โมเดลถูกบันทึกแล้วที่ chatbot_model/")
+    # บันทึกโมเดล
+    with open("chatbot_model.pkl", "wb") as f:
+        pickle.dump((model, tokenizer), f)
+
+    print("โมเดลถูกเทรนและบันทึกเรียบร้อย!")
+
+if __name__ == "__main__":
+    train_model()
