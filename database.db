@@ -1,6 +1,0 @@
-CREATE TABLE chatbot_feedback (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    question TEXT NOT NULL,
-    answer TEXT NOT NULL,
-    feedback TEXT NOT NULL
-);
