@@ -12,6 +12,45 @@ fetch("data.json")
         localStorage.setItem("chatData", JSON.stringify(chatData));
     });
 
+// ฟังก์ชันคำนวณ Levenshtein Distance
+function levenshtein(a, b) {
+    let tmp;
+    if (a.length === 0) return b.length;
+    if (b.length === 0) return a.length;
+    if (a.length > b.length) tmp = a, a = b, b = tmp;
+
+    let row = Array(a.length + 1).fill(0);
+    for (let i = 0; i <= a.length; i++) row[i] = i;
+
+    for (let i = 1; i <= b.length; i++) {
+        let prev = i;
+        for (let j = 1; j <= a.length; j++) {
+            let val = row[j - 1];
+            if (b[i - 1] !== a[j - 1]) val = Math.min(prev, row[j], row[j - 1]) + 1;
+            row[j - 1] = prev;
+            prev = val;
+        }
+        row[a.length] = prev;
+    }
+    return row[a.length];
+}
+
+// ค้นหาคำถามที่ใกล้เคียงที่สุด
+function findClosestQuestion(userText) {
+    let minDistance = Infinity;
+    let bestMatch = null;
+
+    for (let question in chatData) {
+        let distance = levenshtein(userText, question);
+        if (distance < minDistance && distance <= 2) {  // อนุญาตให้ผิดได้ไม่เกิน 2 ตัวอักษร
+            minDistance = distance;
+            bestMatch = question;
+        }
+    }
+
+    return bestMatch;
+}
+
 // ฟังก์ชันส่งข้อความ
 function sendMessage() {
     let text = userInput.value.trim();
@@ -20,12 +59,14 @@ function sendMessage() {
     // แสดงข้อความของผู้ใช้
     appendMessage("คุณ", text);
 
-    // ตรวจสอบว่ามีคำตอบหรือไม่
-    let response = chatData[text] || "ฉันยังไม่รู้คำตอบ กรุณาสอนฉันด้วย!";
+    // ค้นหาคำถามที่ใกล้เคียง
+    let matchedQuestion = findClosestQuestion(text);
+    let response = matchedQuestion ? chatData[matchedQuestion] : "ฉันยังไม่รู้คำตอบ กรุณาสอนฉันด้วย!";
+    
     let botMessage = appendMessage("บอท", response);
 
-    // ถ้าบอทไม่รู้ ให้เพิ่มปุ่มเรียนรู้
-    if (!chatData[text]) {
+    // ถ้าบอทยังไม่รู้ ให้เพิ่มปุ่มสอนบอท
+    if (!matchedQuestion) {
         addFeedbackButtons(botMessage, text);
     }
 
