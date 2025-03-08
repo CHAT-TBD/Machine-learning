@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,23 +7,15 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>AI Chatbot</h1>
-        <input type="text" id="userInput" placeholder="พิมพ์ข้อความ...">
-        <button onclick="sendMessage()">ส่ง</button>
-        <p id="chatResponse"></p>
 
-        <div id="feedback" style="display: none;">
-            <button onclick="sendFeedback('good')">เยี่ยม</button>
-            <button onclick="sendFeedback('bad')">แย่</button>
-        </div>
-
-        <div id="teachBot" style="display: none;">
-            <input type="text" id="newAnswer" placeholder="สอนบอท...">
-            <button onclick="teachBot()">บันทึก</button>
+    <div class="chat-container">
+        <div class="chat-box" id="chat-box"></div>
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="พิมพ์ข้อความที่นี่...">
+            <button onclick="sendMessage()">ส่ง</button>
         </div>
     </div>
 
-    <script src="chatbot.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
