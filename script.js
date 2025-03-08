@@ -42,7 +42,7 @@ function findClosestQuestion(userText) {
 
     for (let question in chatData) {
         let distance = levenshtein(userText, question);
-        if (distance < minDistance && distance <= 2) {  // อนุญาตให้ผิดได้ไม่เกิน 2 ตัวอักษร
+        if (distance < minDistance && distance <= 4) {  // อนุญาตให้ผิดได้ไม่เกิน 4 ตัวอักษร
             minDistance = distance;
             bestMatch = question;
         }
@@ -89,11 +89,11 @@ function addFeedbackButtons(element, userQuestion) {
     feedbackDiv.classList.add("feedback");
 
     let correctButton = document.createElement("button");
-    correctButton.textContent = "เยี่ยม";
+    correctButton.textContent = "👍";
     correctButton.onclick = () => correctResponse(userQuestion, element.innerText);
 
     let incorrectButton = document.createElement("button");
-    incorrectButton.textContent = "แย่";
+    incorrectButton.textContent = "👎";
     incorrectButton.onclick = () => incorrectResponse(userQuestion);
 
     feedbackDiv.appendChild(correctButton);
@@ -110,7 +110,7 @@ function correctResponse(question, answer) {
 
 // เมื่อผู้ใช้บอกว่าคำตอบผิด
 function incorrectResponse(question) {
-    let newAnswer = prompt("โปรดป้อนคำตอบที่ถูกต้องสำหรับ: " + question);
+    let newAnswer = prompt("สอนฉันตอบคำตอบที่ถูกต้องสำหรับ: " + question);
     if (newAnswer) {
         chatData[question] = newAnswer;
         localStorage.setItem("chatData", JSON.stringify(chatData));
