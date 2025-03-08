@@ -1,6 +1,6 @@
 const GIST_ID = "ff808b6318c68d96737b7f90ac7036e0";
 const GIST_URL = `https://gist.githubusercontent.com/raw/${GIST_ID}/chatbot-data.json`;
-const GITHUB_TOKEN = "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";
+const GITHUB_TOKEN = "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"; // ตรวจสอบว่าสิทธิ์ Gist เปิดใช้งาน
 const GIST_UPDATE_URL = `https://api.github.com/gists/${GIST_ID}`;
 
 let chatData = {};
@@ -31,9 +31,10 @@ async function sendMessage() {
     if (!text) return;
 
     appendMessage("คุณ", text);
-    let response = findClosestMatch(text) || "ฉันยังไม่รู้คำตอบ กรุณาสอนฉันด้วย!";
-    
-    if (!chatData[text]) {
+    let response = findClosestMatch(text);
+
+    if (!response) {
+        response = "ฉันยังไม่รู้คำตอบ กรุณาสอนฉันด้วย!";
         addFeedbackButtons(text);
     }
 
@@ -95,14 +96,19 @@ function addFeedbackButtons(question) {
     document.getElementById("chat-box").appendChild(feedbackDiv);
 }
 
-// สอนบอท
-async function correctResponse(question) {
-    let newAnswer = prompt(`ป้อนคำตอบสำหรับ "${question}"`);
+// ฟังก์ชันสำหรับการกดปุ่ม "แย่"
+async function incorrectResponse(question) {
+    let newAnswer = prompt(`ฉันควรตอบอะไรสำหรับ "${question}"?`);
     if (newAnswer) {
         chatData[question] = { answer: newAnswer, addedBy: deviceID };
         await updateGistData();
-        alert("บอทเรียนรู้คำตอบแล้ว!");
+        alert("ขอบคุณ! ฉันเรียนรู้คำตอบใหม่แล้ว");
     }
+}
+
+// ฟังก์ชันสำหรับการกดปุ่ม "เยี่ยม"
+function correctResponse(question) {
+    alert(`ขอบคุณ! ฉันจะจำ "${chatData[question].answer]}" ไว้เป็นคำตอบที่ถูกต้อง`);
 }
 
 // อัปเดตข้อมูลลง Gist
