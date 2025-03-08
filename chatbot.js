@@ -1,31 +1,3 @@
-function startTraining() {
-    fetch("/train", { method: "POST" })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById("status").innerText = "สถานะ: กำลังเทรน...";
-            checkStatus();
-        });
-}
-
-function checkStatus() {
-    fetch("/status")
-        .then(response => response.json())
-        .then(data => {
-            let statusText = document.getElementById("status");
-
-            if (data.status === "training") {
-                statusText.innerText = "สถานะ: กำลังเทรน...";
-                setTimeout(checkStatus, 2000);
-            } else if (data.status === "done") {
-                statusText.innerText = "สถานะ: เทรนเสร็จแล้ว!";
-            } else if (data.status === "error") {
-                statusText.innerText = "สถานะ: เกิดข้อผิดพลาด!";
-            } else {
-                statusText.innerText = "สถานะ: รอเริ่มเทรน";
-            }
-        });
-}
-
 function sendMessage() {
     let userInput = document.getElementById("userInput").value;
     if (userInput.trim() === "") return;
@@ -38,5 +10,21 @@ function sendMessage() {
     .then(response => response.json())
     .then(data => {
         document.getElementById("chatResponse").innerText = "บอท: " + data.response;
+        document.getElementById("feedback").style.display = "block";
+    });
+}
+
+function sendFeedback(feedback) {
+    let userInput = document.getElementById("userInput").value;
+    let botResponse = document.getElementById("chatResponse").innerText.replace("บอท: ", "");
+
+    fetch("/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: userInput, answer: botResponse, feedback: feedback })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert("บันทึกฟีดแบค: " + feedback);
     });
 }
