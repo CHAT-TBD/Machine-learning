@@ -13,6 +13,7 @@ body {
     max-height: 480px;
     border: 5px solid black;
     margin: auto;
+    position: relative;
 }
 
 .square {
@@ -36,4 +37,5 @@ body {
 .piece {
     cursor: grab;
     user-select: none;
+    position: static;
 }
