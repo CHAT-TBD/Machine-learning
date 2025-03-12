@@ -10,15 +10,14 @@ let board = [
 ];
 
 let selectedPiece = null;
-let currentTurn = "w"; // เริ่มที่ฝ่ายขาว
 let startX, startY;
+let offsetX, offsetY;
 
 const pieceSymbols = {
     p: "♟", r: "♜", n: "♞", b: "♝", q: "♛", k: "♚",
     P: "♙", R: "♖", N: "♘", B: "♗", Q: "♕", K: "♔"
 };
 
-// ฟังก์ชันสร้างกระดาน
 function drawBoard() {
     let boardDiv = document.getElementById("chessboard");
     boardDiv.innerHTML = "";
@@ -34,25 +33,19 @@ function drawBoard() {
                 let piece = document.createElement("div");
                 piece.textContent = pieceSymbols[board[row][col]];
                 piece.className = "piece";
-                piece.draggable = true;
                 piece.dataset.row = row;
                 piece.dataset.col = col;
                 piece.dataset.piece = board[row][col];
 
-                // รองรับการลากบนคอมพิวเตอร์
+                // รองรับลากหมาก
                 piece.addEventListener("dragstart", dragStart);
-                
-                // รองรับการลากบนมือถือ
                 piece.addEventListener("touchstart", touchStart);
 
                 square.appendChild(piece);
             }
 
-            // รองรับ Drag & Drop บนคอมพิวเตอร์
             square.addEventListener("dragover", dragOver);
             square.addEventListener("drop", drop);
-
-            // รองรับ Drag & Drop บนมือถือ
             square.addEventListener("touchmove", touchMove);
             square.addEventListener("touchend", touchEnd);
 
@@ -64,6 +57,7 @@ function drawBoard() {
 // **ฟังก์ชัน Drag & Drop บนคอม**
 function dragStart(event) {
     selectedPiece = event.target;
+    event.dataTransfer.setData("text", "");
 }
 
 function dragOver(event) {
@@ -80,23 +74,37 @@ function touchStart(event) {
     selectedPiece = event.target;
     startX = event.touches[0].clientX;
     startY = event.touches[0].clientY;
+
+    offsetX = selectedPiece.getBoundingClientRect().width / 2;
+    offsetY = selectedPiece.getBoundingClientRect().height / 2;
+
+    event.preventDefault();
 }
 
 function touchMove(event) {
+    if (!selectedPiece) return;
+
+    let touch = event.touches[0];
+    selectedPiece.style.position = "absolute";
+    selectedPiece.style.left = touch.clientX - offsetX + "px";
+    selectedPiece.style.top = touch.clientY - offsetY + "px";
+
     event.preventDefault();
 }
 
 function touchEnd(event) {
-    let endX = event.changedTouches[0].clientX;
-    let endY = event.changedTouches[0].clientY;
-    let target = document.elementFromPoint(endX, endY);
+    let touch = event.changedTouches[0];
+    let target = document.elementFromPoint(touch.clientX, touch.clientY);
 
-    if (target && target.dataset.row && target.dataset.col) {
+    if (target && target.dataset.row !== undefined && target.dataset.col !== undefined) {
         movePiece(target.dataset.row, target.dataset.col);
     }
+
+    selectedPiece.style.position = "static";
+    selectedPiece = null;
 }
 
-// **ตรวจสอบการเดินหมาก**
+// **ย้ายหมาก**
 function movePiece(toRow, toCol) {
     if (!selectedPiece) return;
 
@@ -109,7 +117,6 @@ function movePiece(toRow, toCol) {
         board[toRow][toCol] = board[fromRow][fromCol];
         board[fromRow][fromCol] = "";
         drawBoard();
-        setTimeout(aiMove, 500);
     }
 
     selectedPiece = null;
@@ -146,26 +153,6 @@ function isValidMove(fromRow, fromCol, toRow, toCol) {
             return dr <= 1 && dc <= 1;
     }
     return false;
-}
-
-// **AI ใช้ Minimax (พื้นฐาน)**
-function aiMove() {
-    let moveMade = false;
-    for (let row = 0; row < 8; row++) {
-        for (let col = 0; col < 8; col++) {
-            if (board[row][col] && board[row][col] === board[row][col].toLowerCase()) {
-                let toRow = row + 1;
-                if (toRow < 8 && board[toRow][col] === "") {
-                    board[toRow][col] = board[row][col];
-                    board[row][col] = "";
-                    moveMade = true;
-                    break;
-                }
-            }
-        }
-        if (moveMade) break;
-    }
-    drawBoard();
 }
 
 drawBoard();
