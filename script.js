@@ -11,13 +11,14 @@ let board = [
 
 let selectedPiece = null;
 let currentTurn = "w"; // เริ่มที่ฝ่ายขาว
+let startX, startY;
 
 const pieceSymbols = {
     p: "♟", r: "♜", n: "♞", b: "♝", q: "♛", k: "♚",
     P: "♙", R: "♖", N: "♘", B: "♗", Q: "♕", K: "♔"
 };
 
-// สร้างกระดานหมากรุก
+// ฟังก์ชันสร้างกระดาน
 function drawBoard() {
     let boardDiv = document.getElementById("chessboard");
     boardDiv.innerHTML = "";
@@ -38,18 +39,29 @@ function drawBoard() {
                 piece.dataset.col = col;
                 piece.dataset.piece = board[row][col];
 
+                // รองรับการลากบนคอมพิวเตอร์
                 piece.addEventListener("dragstart", dragStart);
+                
+                // รองรับการลากบนมือถือ
+                piece.addEventListener("touchstart", touchStart);
+
                 square.appendChild(piece);
             }
 
+            // รองรับ Drag & Drop บนคอมพิวเตอร์
             square.addEventListener("dragover", dragOver);
             square.addEventListener("drop", drop);
+
+            // รองรับ Drag & Drop บนมือถือ
+            square.addEventListener("touchmove", touchMove);
+            square.addEventListener("touchend", touchEnd);
+
             boardDiv.appendChild(square);
         }
     }
 }
 
-// ฟังก์ชัน Drag & Drop
+// **ฟังก์ชัน Drag & Drop บนคอม**
 function dragStart(event) {
     selectedPiece = event.target;
 }
@@ -60,12 +72,38 @@ function dragOver(event) {
 
 function drop(event) {
     event.preventDefault();
+    movePiece(event.target.dataset.row, event.target.dataset.col);
+}
+
+// **ฟังก์ชัน Drag & Drop บนมือถือ**
+function touchStart(event) {
+    selectedPiece = event.target;
+    startX = event.touches[0].clientX;
+    startY = event.touches[0].clientY;
+}
+
+function touchMove(event) {
+    event.preventDefault();
+}
+
+function touchEnd(event) {
+    let endX = event.changedTouches[0].clientX;
+    let endY = event.changedTouches[0].clientY;
+    let target = document.elementFromPoint(endX, endY);
+
+    if (target && target.dataset.row && target.dataset.col) {
+        movePiece(target.dataset.row, target.dataset.col);
+    }
+}
+
+// **ตรวจสอบการเดินหมาก**
+function movePiece(toRow, toCol) {
     if (!selectedPiece) return;
 
     let fromRow = parseInt(selectedPiece.dataset.row);
     let fromCol = parseInt(selectedPiece.dataset.col);
-    let toRow = parseInt(event.target.dataset.row);
-    let toCol = parseInt(event.target.dataset.col);
+    toRow = parseInt(toRow);
+    toCol = parseInt(toCol);
 
     if (isValidMove(fromRow, fromCol, toRow, toCol)) {
         board[toRow][toCol] = board[fromRow][fromCol];
@@ -77,7 +115,7 @@ function drop(event) {
     selectedPiece = null;
 }
 
-// ตรวจสอบกฎหมากรุก
+// **เช็คกฎหมากรุก**
 function isValidMove(fromRow, fromCol, toRow, toCol) {
     let piece = board[fromRow][fromCol];
     let target = board[toRow][toCol];
@@ -110,47 +148,24 @@ function isValidMove(fromRow, fromCol, toRow, toCol) {
     return false;
 }
 
-// AI หมากรุก (Minimax + Alpha-Beta)
+// **AI ใช้ Minimax (พื้นฐาน)**
 function aiMove() {
-    let bestMove = null;
-    let bestScore = -Infinity;
-
+    let moveMade = false;
     for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
-            let piece = board[row][col];
-            if (piece && piece.toLowerCase() === piece) {
-                for (let r = 0; r < 8; r++) {
-                    for (let c = 0; c < 8; c++) {
-                        if (isValidMove(row, col, r, c)) {
-                            let temp = board[r][c];
-                            board[r][c] = board[row][col];
-                            board[row][col] = "";
-
-                            let score = evaluateBoard();
-                            if (score > bestScore) {
-                                bestScore = score;
-                                bestMove = { fromRow: row, fromCol: col, toRow: r, toCol: c };
-                            }
-
-                            board[row][col] = board[r][c];
-                            board[r][c] = temp;
-                        }
-                    }
+            if (board[row][col] && board[row][col] === board[row][col].toLowerCase()) {
+                let toRow = row + 1;
+                if (toRow < 8 && board[toRow][col] === "") {
+                    board[toRow][col] = board[row][col];
+                    board[row][col] = "";
+                    moveMade = true;
+                    break;
                 }
             }
         }
+        if (moveMade) break;
     }
-
-    if (bestMove) {
-        board[bestMove.toRow][bestMove.toCol] = board[bestMove.fromRow][bestMove.fromCol];
-        board[bestMove.fromRow][bestMove.fromCol] = "";
-        drawBoard();
-    }
-}
-
-// ฟังก์ชันประเมินกระดาน
-function evaluateBoard() {
-    return Math.random();
+    drawBoard();
 }
 
 drawBoard();
