@@ -1,18 +1,16 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Chatbot</title>
+    <title>AI Chess</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="chat-container">
-        <div id="chat-box"></div>
-        <input type="text" id="user-input" placeholder="พิมพ์ข้อความ...">
-        <button onclick="sendMessage()">ส่ง</button>
-        <button onclick="openAdminPanel()">⚙️ หลังบ้าน</button>
-    </div>
+    <h1>AI Chess</h1>
+    <div class="chessboard" id="chessboard"></div>
+    <script src="chess.js"></script>
+    <script src="stockfish.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
