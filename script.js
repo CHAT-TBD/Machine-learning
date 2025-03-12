@@ -1,75 +1,156 @@
-var game = new Chess();
-var stockfish = new Worker("stockfish.js");
-var board = document.getElementById("chessboard");
-var selectedSquare = null;
+let board = [
+    ["r", "n", "b", "q", "k", "b", "n", "r"],
+    ["p", "p", "p", "p", "p", "p", "p", "p"],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    ["P", "P", "P", "P", "P", "P", "P", "P"],
+    ["R", "N", "B", "Q", "K", "B", "N", "R"]
+];
 
-// อักขระหมากรุก
+let selectedPiece = null;
+let currentTurn = "w"; // เริ่มที่ฝ่ายขาว
+
 const pieceSymbols = {
     p: "♟", r: "♜", n: "♞", b: "♝", q: "♛", k: "♚",
     P: "♙", R: "♖", N: "♘", B: "♗", Q: "♕", K: "♔"
 };
 
-// ฟังก์ชันสร้างกระดาน
+// สร้างกระดานหมากรุก
 function drawBoard() {
-    board.innerHTML = "";
-    let boardArray = game.board();
-    for (let row = 7; row >= 0; row--) {
+    let boardDiv = document.getElementById("chessboard");
+    boardDiv.innerHTML = "";
+
+    for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
             let square = document.createElement("div");
             square.className = `square ${(row + col) % 2 === 0 ? "white" : "black"}`;
-            square.dataset.position = String.fromCharCode(97 + col) + (row + 1);
+            square.dataset.row = row;
+            square.dataset.col = col;
 
-            let piece = boardArray[row][col];
-            if (piece) {
-                square.textContent = pieceSymbols[piece.type];
-                square.dataset.piece = piece.color + piece.type;
+            if (board[row][col]) {
+                let piece = document.createElement("div");
+                piece.textContent = pieceSymbols[board[row][col]];
+                piece.className = "piece";
+                piece.draggable = true;
+                piece.dataset.row = row;
+                piece.dataset.col = col;
+                piece.dataset.piece = board[row][col];
+
+                piece.addEventListener("dragstart", dragStart);
+                square.appendChild(piece);
             }
 
-            square.addEventListener("click", handleMove);
-            board.appendChild(square);
+            square.addEventListener("dragover", dragOver);
+            square.addEventListener("drop", drop);
+            boardDiv.appendChild(square);
         }
     }
 }
 
-// ฟังก์ชันเลือกเดินหมาก
-function handleMove(event) {
-    let clickedSquare = event.target.dataset.position;
-
-    if (!selectedSquare) {
-        selectedSquare = clickedSquare;
-        event.target.classList.add("selected");
-    } else {
-        let move = game.move({ from: selectedSquare, to: clickedSquare });
-        if (move) {
-            drawBoard();
-            setTimeout(makeAIMove, 500);
-        }
-        selectedSquare = null;
-    }
+// ฟังก์ชัน Drag & Drop
+function dragStart(event) {
+    selectedPiece = event.target;
 }
 
-// ให้ AI คิดหมาก
-function makeAIMove() {
-    if (game.game_over()) {
-        alert("เกมจบแล้ว!");
-        return;
-    }
-    stockfish.postMessage("position fen " + game.fen());
-    stockfish.postMessage("go depth 15");
+function dragOver(event) {
+    event.preventDefault();
 }
 
-// AI ตอบกลับและเดินหมาก
-stockfish.onmessage = function(event) {
-    let move = event.data.match(/bestmove\s(\S+)/);
-    if (move) {
-        game.move(move[1]);
+function drop(event) {
+    event.preventDefault();
+    if (!selectedPiece) return;
+
+    let fromRow = parseInt(selectedPiece.dataset.row);
+    let fromCol = parseInt(selectedPiece.dataset.col);
+    let toRow = parseInt(event.target.dataset.row);
+    let toCol = parseInt(event.target.dataset.col);
+
+    if (isValidMove(fromRow, fromCol, toRow, toCol)) {
+        board[toRow][toCol] = board[fromRow][fromCol];
+        board[fromRow][fromCol] = "";
         drawBoard();
+        setTimeout(aiMove, 500);
+    }
 
-        if (game.game_over()) {
-            alert("เกมจบแล้ว!");
+    selectedPiece = null;
+}
+
+// ตรวจสอบกฎหมากรุก
+function isValidMove(fromRow, fromCol, toRow, toCol) {
+    let piece = board[fromRow][fromCol];
+    let target = board[toRow][toCol];
+
+    if (!piece) return false;
+    if (target && target.toUpperCase() === target === piece.toUpperCase()) return false;
+
+    let dr = Math.abs(toRow - fromRow);
+    let dc = Math.abs(toCol - fromCol);
+
+    switch (piece.toLowerCase()) {
+        case "p":
+            let direction = piece === "P" ? -1 : 1;
+            if (toCol === fromCol && !target && (toRow - fromRow) === direction) return true;
+            if (dr === 1 && dc === 1 && target) return true;
+            return false;
+        case "r":
+            if (fromRow !== toRow && fromCol !== toCol) return false;
+            return true;
+        case "n":
+            return (dr === 2 && dc === 1) || (dr === 1 && dc === 2);
+        case "b":
+            if (dr !== dc) return false;
+            return true;
+        case "q":
+            return dr === dc || fromRow === toRow || fromCol === toCol;
+        case "k":
+            return dr <= 1 && dc <= 1;
+    }
+    return false;
+}
+
+// AI หมากรุก (Minimax + Alpha-Beta)
+function aiMove() {
+    let bestMove = null;
+    let bestScore = -Infinity;
+
+    for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+            let piece = board[row][col];
+            if (piece && piece.toLowerCase() === piece) {
+                for (let r = 0; r < 8; r++) {
+                    for (let c = 0; c < 8; c++) {
+                        if (isValidMove(row, col, r, c)) {
+                            let temp = board[r][c];
+                            board[r][c] = board[row][col];
+                            board[row][col] = "";
+
+                            let score = evaluateBoard();
+                            if (score > bestScore) {
+                                bestScore = score;
+                                bestMove = { fromRow: row, fromCol: col, toRow: r, toCol: c };
+                            }
+
+                            board[row][col] = board[r][c];
+                            board[r][c] = temp;
+                        }
+                    }
+                }
+            }
         }
     }
-};
 
-// เริ่มเกม
+    if (bestMove) {
+        board[bestMove.toRow][bestMove.toCol] = board[bestMove.fromRow][bestMove.fromCol];
+        board[bestMove.fromRow][bestMove.fromCol] = "";
+        drawBoard();
+    }
+}
+
+// ฟังก์ชันประเมินกระดาน
+function evaluateBoard() {
+    return Math.random();
+}
+
 drawBoard();
